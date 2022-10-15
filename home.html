@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap.min.css">
+
+    <title>AB Testing Guide</title>
+
+    <style>
+      body {
+        background-color: powderblue;
+        position: relative;
+      }
+
+      .contents-menu > nav {
+        top: 20px;
+        position: fixed;
+      }
+
+      code {
+        font-family: Consolas,"courier new";
+        color: crimson;
+        background-color: #f1f1f1;
+        font-size: 105%;
+        border-radius: 10px;
+
+        display: block;
+        white-space: pre;
+
+        padding: 10px;
+        margin: 10px;
+      }
+
+      nav {
+        font-size: 80%;
+        padding: 0;
+      }
+
+      .nav-link {
+        padding: 4px 0px 4px 5px;
+      }
+
+      h5, h4 {
+        margin-top: 20px;
+      }
+
+      img {
+        display: block;
+        margin: 5px;
+      }
+
+      .jumbo-title {
+        margin-top: 20px;
+      }
+
+      .code-comment {
+        color: #ADADAD;
+      }
+
+    </style>
+
+  </head>
+  <body data-spy="scroll" data-target="#navbar-example3" data-offset="300">
+    <div class="container-sm">
+      <div class="row">
+        <div class="col-4 contents-menu">
+          <nav id="navbar-example3" class="navbar navbar-light bg-light flex-column">
+            <a class="navbar-brand" href="#">Contents</a>
+            <nav class="nav nav-pills flex-column">
+
+              <a class="nav-link" href="#item-3">Understanding Statistical Tests</a>
+              <nav class="nav nav-pills flex-column">
+                <a class="nav-link ml-3 my-1" href="#item-3-1">(Student) T Distribution</a>
+                <a class="nav-link ml-3 my-1" href="#item-3-2">Chi^2 Distribution</a>
+                <a class="nav-link ml-3 my-1" href="#item-3-3">Interpretting P-values</a>
+              </nav>
+              <a class="nav-link" href="#item-4">Performing the T-test</a>
+              <nav class="nav nav-pills flex-column">
+                <a class="nav-link ml-3 my-1" href="#item-4-1">Mean and STD</a>
+                <a class="nav-link ml-3 my-1" href="#item-4-2">Combined STD</a>
+                <a class="nav-link ml-3 my-1" href="#item-4-3">df for Two Samples</a>
+                <a class="nav-link ml-3 my-1" href="#item-4-4">T-score and P-value</a>
+              </nav>
+              <a class="nav-link" href="#item-5">Performing Chi^2 test</a>
+              <nav class="nav nav-pills flex-column">
+                <a class="nav-link ml-3 my-1" href="#item-5-1">Expected Values</a>
+                <a class="nav-link ml-3 my-1" href="#item-5-2">df for Chi^2</a>
+                <a class="nav-link ml-3 my-1" href="#item-5-3">Chi^2 and P-value</a>
+              </nav>
+            </nav>
+          </nav>
+        </div>
+        <div class="col-8">
+          <div class="jumbotron jumbotron-fluid jumbo-title">
+            <div class="container">
+              <h1 class="display-4">AB Testing Walkthough Guide</h1>
+              <p class="lead">In this guide, we will review the two statistical tests commonly used in AB Testing to compare the metrics of the different interfaces:
+                  <br />
+                <b>t-test for difference of means</b> and <b>chi-squared test for homogeneity</b>.</p>
+            </div>
+          </div>
+
+
+            <h4 id="item-3">Understanding Statistical Tests</h4>
+            <p>
+              This section will mostly be covered by the lecture. Therefore, this section will just be a quick overview.
+            </p>
+            <h5 id="item-3-1">T distribution</h5>
+            <p>
+              We will be using the student T distribution (T-dist).
+              To garner a p-value from the T-dist, we need the t-score and the degrees of freedom (df).
+            </p>
+            <p>
+              The image below shows how the degrees of freedom affect the t-distribution.
+              <img class="img-fluid" src="assets/t-dist.png"/>
+              Notice how as the df increases, the distribution becomes normal.
+            </p>
+            <p>
+              The next image simulates the definition of a p-value.
+              <img class="img-fluid" src="assets/t-dist-prob.png"/>
+              The one of the red shaded areas represent the area that your t-score encases on the t-distribution (this shows the areas are the same for the t-score even if the sign changes).
+              <br/>
+              Therefore, the further away your t-score is from zero, the lower the p-value.
+            </p>
+            <p>
+              Calculating this red area corresponding to your p-value is a complicated integral: a calculator is necessary.
+            </p>
+
+            <h5 id="item-3-2">Chi^2 distribution</h5>
+            <p>
+              While the t-test is aimed at large sets of 2 samples to be compared, the chi^2 test is suited for comparing how categories are different. Therefore, it is a completely different distribution.
+              <img class="img-fluid" src="assets/chi2-dist.jpg"/>
+              Is it skewed right but gets more even as df increases.
+              As before, we need df to calculate the p-value from this distribution. However, instead of a t-score, this test uses a chi^2 value.
+            </p>
+            <p>
+              This time, the chi^2 value is stritcly positive (it's a squared value), and the p-value area corresponds to the red shaded region in the image below.
+              <img class="img-fluid" src="assets/chi2-dist-prob.png"/>
+            </p>
+
+            <h5 id="item-3-3">Interpreting P-value</h5>
+            <p>
+              With each test, your script will calculate a <strong>p-value</strong>. We will compare this p-value against our significance level (which is .05).
+              The comparison will then tell us what to do with our set of hypotheses for each metric.
+            </p>
+            <p>
+              If your <strong>p-value &lt; significance level (.05) </strong>, then you can reject the null.
+              Therefore, your results are <strong>statistically significant</strong>, meaning that there is a high chance the alternative hypothesis will repeat itself in other trials or situations.
+            </p>
+            <p>
+              If your <strong>p-value &gt; significance level (.05) </strong>, then you fail to reject the null.
+              Therefore, your results are <strong>statistically insignificant</strong>, meaning that there is a doubt as to whether the alternative hypothesis will repeat itself in other trials or situations.
+            </p>
+            <p>
+              Yes, stats is wordy, but it is important that we see you interpreting the results in your submission of the assignment. To someone who doesn't study stats, the numbers mean nothing.
+              So when making your conclusions with your p-value,
+              you must contextualize the cookie cutter responses above with your metric you were testing so that anyone could understans your results.
+            </p>
+
+
+            <h4 id="item-4">Performing the T-tests</h4>
+              <p>
+                Below will explain the mathematics to perform a two sample t-test for the difference of means. Your task is to take the math and turn it into code so that,
+                for any dataset given as lists, you can easily get a p-value. However, it is still your job to intepret the p-value. The number alone is not enough.
+              </p>
+
+            <h5 id="item-4-1">Mean and STD</h5>
+            <p>
+              To begin t-test, we need the mean and standard deviation of both samples.
+              <br/>
+              The mathematics for the average (mean) is trivial.
+              <br/>
+              For standard deviation:
+              <img class="img-fluid" src="assets/std.gif"/>
+              <br/>
+              where i is an element in the list, avg is the average of all elements in the list,
+              and n is the number of elements in the list.
+              <br/>
+            </p>
+
+            <h5 id="item-4-2">Standard Error</h5>
+            <p>
+              Next, we need to calculate the standard error.
+
+              <img class="img-fluid" src="assets/se.gif"/>
+              <br/>
+              where std_a is the standard deviation of a, std_b is the standard deviation of b,
+              n_a is the number of elements in a, and n_b is the number of elements in b.
+              <br/>
+              As seen in the formula above, you'll need to calculate standard deviation for both a and b as part of calculating
+              standard error.
+            </p>
+
+            <h5 id="item-4-3"><em>df</em> Calculation for Two Samples </h5>
+            <p>
+              Then, we need the combined degrees of freedom between our two samples, a very complicated problem, but the formula below is a really good approximation for when you have more than 5 users.
+
+              <img class="img-fluid" src="assets/df.png"/>
+              <br/>
+              where se is the standard error, std_a is the standard deviation of a, std_b is the standard deviation of b,
+              n_a is the number of elements in a, n_b is the number of elements in b,
+              and round(x) rounds x to the nearest integer.
+            </p>
+
+            <h5 id="item-4-4">T-score and P-value</h5>
+            <p>
+              Now we can calculate our t-score.
+              <img class="img-fluid" src="assets/t-score.gif"/>
+              where se is the combined standard error, avg(list) is the average of the values in the list.
+              <br/>
+            </p>
+            <p>
+              Lastly, you must use a <a href="https://stattrek.com/online-calculator/t-distribution" target="_blank">calculator's cumulative distribution function (cdf)</a> to convert the t-score and degrees of freedom into a p-value.
+            </p>
+
+
+            <h4 id="item-5">Performing the Chi^2 Test</h4>
+            <h5 id="item-5-1">Expected Values</h5>
+            <p>
+              Calculating expected values depends wholly on the counts in the grid.
+
+              The formula is simple but needs some context.
+
+              <img class="img-fluid" src="assets/expected-count.png"/>
+
+              Row total will be the sum of all the numbers in the same row of the element.
+              <br/>
+              Column total will be the sum of all the numbers in the same column of the element.
+              <br/>
+              Grand total is the sum of all the elements in the grid.
+            </p>
+            <p>
+              The following images (<a href="https://www.mathsisfun.com/data/chi-square-test.html" target="_blank">source</a>) shows an example in practice.
+              <img class="img-fluid" src="assets/counts.png"/>
+              Above is the grid of counts.
+              Below is the formula applied.
+              <img class="img-fluid" src="assets/exp-count-ex.png"/>
+              In our case, instead of men and women, we will have A and B. Also, instead of cat and dog, our metric will be there.
+              <br/>
+              Keep in mind that the grid isn't always square: we can have multiple categories for both A and B.
+            </p>
+
+            <h5 id="item-5-2">df for Chi^2</h5>
+            <p>
+              Df is very simple to calculate for a chi^2 test of homogeneity.
+            </p>
+            <p>
+              df = (rows − 1) × (columns − 1)
+              <br><br>
+              Therefore, for a 2by2, df = (1)(1) = 1
+              <br>
+              For a 2by4, df = (1)(3) = 3
+            </p>
+
+            <h5 id="item-5-3">Chi^2 and P-value</h5>
+            <p>
+              Now we can calculate our chi^2 value. The formula is below.
+              <img class="img-fluid" src="assets/chi2.gif"/>
+              The fancy X^2 stands for Chi^2.
+              <br/>
+              You must apply the formula to each element in the grid. Luckily we now have two corresponding grids,
+              one with the observed counts and the other (created by the helper function above), with the expected counts.
+            </p>
+            <p>
+              Lastly, with your chi^2 value and degrees of freedom, you must use a <a href="https://stattrek.com/online-calculator/chi-square" target="_blank">cdf chi^2 function from a calculator</a>to calculate the p-value.
+            </p>
+
+            <footer>Hope this was helpful :)</footer>
+          </div>
+        </div>
+      </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  </body>
+</html>
