@@ -180,11 +180,11 @@
               <br/>
             </p>
 
-            <h5 id="item-4-2">Standard Error</h5>
+            <h5 id="item-4-2">Combined Standard Deviation</h5>
             <p>
-              Next, we need to calculate the standard error.
+              Next, we need to calculate the standard deviation. For a student t-test, we use the pooled standard deviation, s_p, which is calculated as follows.
 
-              <img class="img-fluid" src="assets/se.gif"/>
+              <img class="img-fluid" src="assets/s_d.gif"/>
               <br/>
               where std_a is the standard deviation of a, std_b is the standard deviation of b,
               n_a is the number of elements in a, and n_b is the number of elements in b.
@@ -193,26 +193,23 @@
               standard error.
             </p>
 
+
             <h5 id="item-4-3"><em>df</em> Calculation for Two Samples </h5>
             <p>
-              Then, we need the combined degrees of freedom between our two samples, a very complicated problem, but the formula below is a really good approximation for when you have more than 5 users.
-
-              <img class="img-fluid" src="assets/df.png"/>
-              <br/>
-              where se is the standard error, std_a is the standard deviation of a, std_b is the standard deviation of b,
-              n_a is the number of elements in a, n_b is the number of elements in b,
-              and round(x) rounds x to the nearest integer.
+              Then, we need the combined degrees of freedom between our two samples, a very complicated problem, but for a student t-test, it's simple.
+            <img class="img-fluid" src="assets/df.gif">
+              where n_a is the number of elements in a, n_b is the number of elements in b.
             </p>
 
             <h5 id="item-4-4">T-score and P-value</h5>
             <p>
-              Now we can calculate our t-score.
+              Now we can calculate our t-score for our student t!
               <img class="img-fluid" src="assets/t-score.gif"/>
-              where se is the combined standard error, avg(list) is the average of the values in the list.
+              where se is the combined standard error, avg_list is the average of the values in the list.
               <br/>
             </p>
             <p>
-              Lastly, you must use a <a href="https://stattrek.com/online-calculator/t-distribution" target="_blank">calculator's cumulative t distribution function (cdf)</a> to convert the t-score and degrees of freedom into a p-value.
+              Lastly, you can use a <a href="https://stattrek.com/online-calculator/t-distribution" target="_blank">calculator's cumulative t distribution function (cdf)</a> to convert the t-score and degrees of freedom into a p-value.
             </p>
 
 
@@ -264,7 +261,7 @@
               one with the observed counts and the other (created by the helper function above), with the expected counts.
             </p>
             <p>
-              Lastly, with your chi^2 value and degrees of freedom, you must use a <a href="https://stattrek.com/online-calculator/chi-square" target="_blank">cdf chi^2 function</a> to calculate the p-value.
+              Lastly, with your chi^2 value and degrees of freedom, you can use a <a href="https://stattrek.com/online-calculator/chi-square" target="_blank">cdf chi^2 function</a> to calculate the p-value.
             </p>
 
             <footer>Hope this was helpful :)</footer>
